@@ -1,0 +1,1 @@
+print('pack3.__init__.py')
