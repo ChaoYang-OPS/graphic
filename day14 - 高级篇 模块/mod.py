@@ -1,11 +1,16 @@
 v = 56
 
+_v = 56
 
 def f():
     print('f被调用')
 
-
+def _f():
+    print('f被调用')
 class SomeClass:
+    pass
+
+class _SomeClass:
     pass
 
 
