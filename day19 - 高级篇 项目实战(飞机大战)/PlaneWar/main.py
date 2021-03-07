@@ -65,7 +65,7 @@ class PlaneWar:
         # 设置窗口的标题
         pygame.display.set_caption("飞机大战")
         # 加载窗口图标
-        windows_icon = pygame.image.load("images/my_plane.png")
+        windows_icon = pygame.image.load("images/my_plane1.png")
         # 设置窗口图标
         pygame.display.set_icon(windows_icon)
 
@@ -124,6 +124,8 @@ class PlaneWar:
 
             # 删除窗口中所有不可见的画面元素
             self._delete_invisible_elements()
+            # 切换我方飞机的图片
+            self.my_plane.switch_image()
 
     def _handle_events(self):
         """处理事件"""
@@ -283,6 +285,7 @@ class PlaneWar:
             if enemy.rect.top >= self.windows.get_rect().height:
                 # 将该架敌机从管理它的所有分组中删除
                 enemy.kill()
+
 
 # 只有当直接运行main.py时
 if __name__ == '__main__':
