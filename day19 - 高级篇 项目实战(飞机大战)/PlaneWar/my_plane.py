@@ -77,7 +77,7 @@ class MyPlane(Sprite):
         """切换我方飞机的图片"""
         # 切换我方飞机图片的计数器加1
         self.switch_counter += 1
-        # 如果计数器加到3，才切换一次我方飞机的图片
+        # 如果计数器加到指定的值，才切换一次我方飞机的图片
         if self.switch_counter == constants.MY_PLANE_SWITCH_IMAGE_FREQUENCY:
 
             # 如果是第1张图片

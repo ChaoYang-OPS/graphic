@@ -111,6 +111,9 @@ class PlaneWar:
             self._handle_events()
             # 设置窗口的背景色
             self.windows.fill(pygame.Color("lightskyblue"))
+
+            # 检测子弹与小型敌机的碰撞
+            self._check_collision_bullets_smalls()
             # 在窗口中绘制所有画面元素
             self._draw_elements()
             # 将内存中的窗口对象绘制到屏幕上以更新屏幕
@@ -226,6 +229,33 @@ class PlaneWar:
         elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
             # 标记我方飞机不向右移动
             self.my_plane.is_move_right = False
+
+    def _check_collision_bullets_smalls(self):
+        """检测子弹与小型敌机的碰撞"""
+
+        # 检测是否有子弹与小型敌机发生了碰撞
+        dict_collided = pygame.sprite.groupcollide(self.small_enemy_group,
+                                                   self.bullet_group,
+                                                   False, True)
+
+        # 如果检测到有子弹与小型敌机发生了碰撞
+        if len(dict_collided) > 0:
+            # 遍历所有发生碰撞的小型敌机
+            for small_enemy in dict_collided.keys():
+
+                # 如果某架小型敌机被标记为没有在切换爆炸图片
+                if not small_enemy.is_switching_explode_image:
+                    # 播放小型敌机爆炸的声音
+                    small_enemy.play_explode_sound()
+                    # 标记小型敌机正在切换爆炸图片
+                    small_enemy.is_switching_explode_image = True
+
+        # 遍历小型敌机分组中的所有小型敌机
+        for small_enemy in self.small_enemy_group.sprites():
+            # 如果某架小型敌机被标记为正在切换爆炸图片
+            if small_enemy.is_switching_explode_image:
+                # 切换小型敌机爆炸的图片
+                small_enemy.switch_explode_image()
 
     def _draw_elements(self):
         """在窗口中绘制所有画面元素"""
