@@ -112,8 +112,9 @@ class PlaneWar:
             # 设置窗口的背景色
             self.windows.fill(pygame.Color("lightskyblue"))
 
-            # 检测子弹与小型敌机的碰撞
-            self._check_collision_bullets_smalls()
+            # 检测碰撞
+            self._check_collisions()
+
             # 在窗口中绘制所有画面元素
             self._draw_elements()
             # 将内存中的窗口对象绘制到屏幕上以更新屏幕
@@ -230,6 +231,14 @@ class PlaneWar:
             # 标记我方飞机不向右移动
             self.my_plane.is_move_right = False
 
+    def _check_collisions(self):
+        """检测碰撞"""
+        # 检测子弹与小型敌机的碰撞
+        self._check_collision_bullets_smalls()
+
+        # 检测子弹与中型敌机的碰撞
+        self._check_collision_bullets_mids()
+
     def _check_collision_bullets_smalls(self):
         """检测子弹与小型敌机的碰撞"""
 
@@ -257,6 +266,52 @@ class PlaneWar:
                 # 切换小型敌机爆炸的图片
                 small_enemy.switch_explode_image()
 
+    def _check_collision_bullets_mids(self):
+        """检测子弹与中型敌机的碰撞"""
+
+        # 检测是否有子弹与中型敌机发生了碰撞
+        dict_collided = pygame.sprite.groupcollide(self.mid_enemy_group,
+                                                   self.bullet_group,
+                                                   False, True)
+
+        # 如果检测到有子弹与中型敌机发生了碰撞
+        if len(dict_collided) > 0:
+            # 遍历所有发生碰撞的小型敌机
+            for mid_enemy in dict_collided.keys():
+                # 如果中型敌机的能量大于0
+                if mid_enemy.energy > 0:
+                    # 中型敌机的能量减1
+                    mid_enemy.energy -= 1
+                # 如果中型敌机的能量等于0
+                if mid_enemy.energy == 0:
+
+                    # 如果某架中型敌机被标记为没有在切换爆炸图片
+                    if not mid_enemy.is_switching_explode_image:
+                        # 播放中型敌机爆炸的声音
+                        mid_enemy.play_explode_sound()
+                        # 标记中型敌机正 在切换爆炸图片
+                        mid_enemy.is_switching_explode_image = True
+                # 如果中型敌机的能量不等于0
+                else:
+                    # 如果某架中型敌机被标记为没有在切换被击中图片
+                    if not mid_enemy.is_switching_hit_image:
+                        # 标记中型敌机正在切换被击中图片
+                        mid_enemy.is_switching_hit_image = True
+
+
+        # 遍历中型敌机分组中的所有中型敌机
+        for mid_enemy in self.mid_enemy_group.sprites():
+
+            # 如果某架中型敌机被标记为正在切换被击中图片
+            if mid_enemy.is_switching_hit_image:
+                # 切换中型敌机被击中的图片
+                mid_enemy.switch_hit_image()
+
+            # 如果某架中型敌机被标记为正在切换爆炸图片
+            if mid_enemy.is_switching_explode_image:
+                # 切换中型敌机爆炸的图片
+                mid_enemy.switch_explode_image()
+
     def _draw_elements(self):
         """在窗口中绘制所有画面元素"""
         # 在窗口中绘制我方飞机
@@ -269,6 +324,12 @@ class PlaneWar:
 
         # 在窗口中绘制所有中型敌机
         self.mid_enemy_group.draw(self.windows)
+
+        # 在窗口中绘制所有中型敌机的能量线
+
+        for mid_enemy in self.mid_enemy_group.sprites():
+            # 在中型敌机的尾部上方绘制能量线
+            mid_enemy.draw_energy_lines()
 
         # 在窗口中绘制所有大型敌机
         self.big_enemy_group.draw(self.windows)

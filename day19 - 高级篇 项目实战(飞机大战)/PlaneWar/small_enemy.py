@@ -27,7 +27,7 @@ class SmallEnemy(Sprite):
         self.explode_image2 = pygame.image.load("images/small_enemy_explode2.png")
         # 加载小型敌机爆炸的第3张图片
         self.explode_image3 = pygame.image.load("images/small_enemy_explode3.png")
-        # 加载小型敌机爆炸的第1张图片
+        # 加载小型敌机爆炸的第4张图片
         self.explode_image4 = pygame.image.load("images/small_enemy_explode4.png")
         # 获得小型敌机的矩形
         self.rect = self.image.get_rect()
@@ -70,7 +70,7 @@ class SmallEnemy(Sprite):
         self.switch__explode_counter += 1
         # 如果计数器加到指定的值，才切换一次小型敌机爆炸的图片
         if self.switch__explode_counter == \
-                constants.SMALLENEMY_SWITCH_EXPLODE_IMAGE_FREQUENCY:
+                constants.SMALL_ENEMY_SWITCH_EXPLODE_IMAGE_FREQUENCY:
 
             # 切换到爆炸的第1张图片
             # 如果是第1张图片
