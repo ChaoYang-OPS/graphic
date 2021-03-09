@@ -44,6 +44,9 @@ class BigEnemy(Sprite):
         # 中型敌机的初始能量
         self.energy = constants.BIG_ENEMY_INITIAL_ENERGY
 
+        # 切换大型敌机图片的计数器
+        self.switch_counter = 0
+
     def update(self):
         """更新大型敌机的位置"""
 
@@ -52,8 +55,11 @@ class BigEnemy(Sprite):
 
     def _load_images(self):
         """加载大型敌机的相关图片"""
-        # 加载大型敌机图片
-        self.image = self.big_image = pygame.image.load("images/big_enemy.png")
+        # 加载大型敌机的第1张图片
+        self.image = self.big_image1 = pygame.image.load("images/big_enemy1.png")
+
+        # 加载大型敌机的第2张图片
+        self.big_image2 = pygame.image.load("images/big_enemy2.png")
 
         # 加载大型敌机爆炸的第1张图片
         self.explode_image1 = pygame.image.load("images/big_enemy_explode1.png")
@@ -80,14 +86,14 @@ class BigEnemy(Sprite):
             # 切换到爆炸的第1张图片
             # 如果是第1张图片
             # 如果是大型敌机的图片
-            if self.image == self.big_image:
-                # 切换到中型敌机被击中的图片
+            if self.image == self.big_image1 or self.image == self.big_image2:
+                # 切换到大型敌机被击中的图片
                 self.image = self.hit_image
-            # 如果是中型敌机被击中的图片
+            # 如果是大型敌机被击中的图片
             elif self.image == self.hit_image:
-                # 切换到中型敌机的图片
-                self.image = self.big_image
-                # 标记中型敌机没有在切换被击中图片
+                # 切换到大型敌机的图片
+                self.image = self.big_image1
+                # 标记大型敌机没有在切换被击中图片
                 self.is_switching_hit_image = False
             # 计数器重置为0
             self.switch__hit_counter = 0
@@ -115,7 +121,7 @@ class BigEnemy(Sprite):
             # 切换到爆炸的第1张图片
             # 如果是第1张图片
             # 如果是大型敌机的图片
-            if self.image == self.big_image:
+            if self.image == self.big_image1 or self.image == self.big_image2:
                 # 切换到爆炸的第1张图片
                 self.image = self.explode_image1
             # 如果爆炸的第1张图片
@@ -164,3 +170,22 @@ class BigEnemy(Sprite):
                              (self.rect.left + self.rect.width
                               * (energy_left_ratio),
                               self.rect.top), 5)
+
+
+    def switch_image(self):
+        """切换大型敌机的图片"""
+        # 切换大型敌机图片的计数器加1
+        self.switch_counter += 1
+        # 如果计数器加到指定的值，才切换一次大型敌机的图片
+        if self.switch_counter == constants.BIG_ENEMY_SWITCH_IMAGE_FREQUENCY:
+
+            # 如果是第1张图片
+            if self.image == self.big_image1:
+                # 切换到第2张图片
+                self.image = self.big_image2
+            # 如果是第2张图片
+            elif self.image == self.big_image2:
+                # 切换到第1张图片
+                self.image = self.big_image1
+            # 计数器重置为0
+            self.switch_counter = 0

@@ -128,8 +128,9 @@ class PlaneWar:
 
             # 删除窗口中所有不可见的画面元素
             self._delete_invisible_elements()
-            # 切换我方飞机的图片
-            self.my_plane.switch_image()
+            # 切换窗口中画面元素的图片
+            self._switch_images()
+
 
     def _handle_events(self):
         """处理事件"""
@@ -385,6 +386,18 @@ class PlaneWar:
             if enemy.rect.top >= self.windows.get_rect().height:
                 # 将该架敌机从管理它的所有分组中删除
                 enemy.kill()
+
+
+    def _switch_images(self):
+        """切换窗口中画面元素的图片"""
+
+        # 切换我方飞机的图片
+        self.my_plane.switch_image()
+
+        # 切换所有大型敌机的图片
+        for big_enemy in self.big_enemy_group.sprites():
+            # 切换大型敌机的图片
+            big_enemy.switch_image()
 
 
 # 只有当直接运行main.py时
