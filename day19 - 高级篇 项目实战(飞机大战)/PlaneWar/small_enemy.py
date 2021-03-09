@@ -18,17 +18,11 @@ class SmallEnemy(Sprite):
 
         self.window = window
 
-        # 加载小型敌机图片
-        self.image = self.small_image = pygame.image.load("images/small_enemy.png")
+        # 加载小型敌机相关图片
 
-        # 加载小型敌机爆炸的第1张图片
-        self.explode_image1 = pygame.image.load("images/small_enemy_explode1.png")
-        # 加载小型敌机爆炸的第2张图片
-        self.explode_image2 = pygame.image.load("images/small_enemy_explode2.png")
-        # 加载小型敌机爆炸的第3张图片
-        self.explode_image3 = pygame.image.load("images/small_enemy_explode3.png")
-        # 加载小型敌机爆炸的第4张图片
-        self.explode_image4 = pygame.image.load("images/small_enemy_explode4.png")
+        self._load_images()
+
+
         # 获得小型敌机的矩形
         self.rect = self.image.get_rect()
         # 获得窗口的矩形
@@ -42,6 +36,9 @@ class SmallEnemy(Sprite):
 
         # 标记小型敌机没有在切换爆炸图片
         self.is_switching_explode_image = False
+
+        # 标记小型敌机没有在切换被击中图片
+        self.is_switching_hit_image = False
         # 切换小型敌机爆炸图片的计数器
         self.switch__explode_counter = 0
 
@@ -96,3 +93,17 @@ class SmallEnemy(Sprite):
                 self.kill()
             # 计数器重置为0
             self.switch__explode_counter = 0
+
+    def _load_images(self):
+        """加载小型敌机相关图片"""
+        # 加载小型敌机图片
+        self.image = self.small_image = pygame.image.load("images/small_enemy.png")
+
+        # 加载小型敌机爆炸的第1张图片
+        self.explode_image1 = pygame.image.load("images/small_enemy_explode1.png")
+        # 加载小型敌机爆炸的第2张图片
+        self.explode_image2 = pygame.image.load("images/small_enemy_explode2.png")
+        # 加载小型敌机爆炸的第3张图片
+        self.explode_image3 = pygame.image.load("images/small_enemy_explode3.png")
+        # 加载小型敌机爆炸的第4张图片
+        self.explode_image4 = pygame.image.load("images/small_enemy_explode4.png")

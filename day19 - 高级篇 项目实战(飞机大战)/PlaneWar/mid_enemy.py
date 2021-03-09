@@ -18,20 +18,8 @@ class MidEnemy(Sprite):
 
         self.window = window
 
-        # 加载中型敌机图片
-        self.image = self.mid_image = pygame.image.load("images/mid_enemy.png")
-
-        # 加载中型敌机爆炸的第1张图片
-        self.explode_image1 = pygame.image.load("images/mid_enemy_explode1.png")
-        # 加载中型敌机爆炸的第2张图片
-        self.explode_image2 = pygame.image.load("images/mid_enemy_explode2.png")
-        # 加载中型敌机爆炸的第3张图片
-        self.explode_image3 = pygame.image.load("images/mid_enemy_explode3.png")
-        # 加载中型敌机爆炸的第4张图片
-        self.explode_image4 = pygame.image.load("images/mid_enemy_explode4.png")
-
-        # 加载中型敌机被击中的图片
-        self.hit_image = pygame.image.load("images/mid_enemy_hit.png")
+        # 加载中型敌机的相关图片
+        self._load_images()
         # 获得中型敌机的矩形
         self.rect = self.image.get_rect()
         # 获得窗口的矩形
@@ -156,3 +144,20 @@ class MidEnemy(Sprite):
                 self.is_switching_hit_image = False
             # 计数器重置为0
             self.switch__hit_counter = 0
+    def _load_images(self):
+        """加载中型敌机的相关图片"""
+
+        # 加载中型敌机图片
+        self.image = self.mid_image = pygame.image.load("images/mid_enemy.png")
+
+        # 加载中型敌机爆炸的第1张图片
+        self.explode_image1 = pygame.image.load("images/mid_enemy_explode1.png")
+        # 加载中型敌机爆炸的第2张图片
+        self.explode_image2 = pygame.image.load("images/mid_enemy_explode2.png")
+        # 加载中型敌机爆炸的第3张图片
+        self.explode_image3 = pygame.image.load("images/mid_enemy_explode3.png")
+        # 加载中型敌机爆炸的第4张图片
+        self.explode_image4 = pygame.image.load("images/mid_enemy_explode4.png")
+
+        # 加载中型敌机被击中的图片
+        self.hit_image = pygame.image.load("images/mid_enemy_hit.png")

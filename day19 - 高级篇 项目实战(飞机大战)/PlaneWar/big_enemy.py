@@ -2,6 +2,8 @@
 import random
 import pygame
 from pygame.sprite import Sprite
+import constants
+
 
 class BigEnemy(Sprite):
     """大型敌机类"""
@@ -9,17 +11,15 @@ class BigEnemy(Sprite):
     def __init__(self, window):
         """初始化大型敌机"""
 
-
         # 调用父类Sprite的特殊方法__init__()
         super().__init__()
-
 
         # 获得窗口对象
 
         self.window = window
+        # 加载大型敌机的相关图片
+        self._load_images()
 
-        # 加载大型敌机图片
-        self.image = pygame.image.load("images/big_enemy.png")
         # 获得大型敌机的矩形
         self.rect = self.image.get_rect()
         # 获得窗口的矩形
@@ -31,10 +31,136 @@ class BigEnemy(Sprite):
         # 大型敌机每次移动时的偏移量
         self.offset = 2
 
+        # 标记大型敌机没有在切换爆炸图片
+        self.is_switching_explode_image = False
+
+        # 标记大型敌机没有在切换被击中图片
+        self.is_switching_hit_image = False
+        # 切换大型敌机爆炸图片的计数器
+        self.switch__explode_counter = 0
+
+        # 切换大型敌机被击中图片的计数器
+        self.switch__hit_counter = 0
+        # 中型敌机的初始能量
+        self.energy = constants.BIG_ENEMY_INITIAL_ENERGY
+
     def update(self):
         """更新大型敌机的位置"""
 
         # 增大大型敌机的属性top以向下移动
         self.rect.top += self.offset
 
+    def _load_images(self):
+        """加载大型敌机的相关图片"""
+        # 加载大型敌机图片
+        self.image = self.big_image = pygame.image.load("images/big_enemy.png")
 
+        # 加载大型敌机爆炸的第1张图片
+        self.explode_image1 = pygame.image.load("images/big_enemy_explode1.png")
+        # 加载大型敌机爆炸的第2张图片
+        self.explode_image2 = pygame.image.load("images/big_enemy_explode2.png")
+        # 加载大型敌机爆炸的第3张图片
+        self.explode_image3 = pygame.image.load("images/big_enemy_explode3.png")
+        # 加载大型敌机爆炸的第4张图片
+        self.explode_image4 = pygame.image.load("images/mid_enemy_explode4.png")
+        # 加载大型敌机爆炸的第5张图片
+        self.explode_image5 = pygame.image.load("images/big_enemy_explode5.png")
+        # 加载大型敌机爆炸的第6张图片
+        self.explode_image6 = pygame.image.load("images/big_enemy_explode6.png")
+        # 加载大型敌机被击中的图片
+        self.hit_image = pygame.image.load("images/big_enemy_hit.png")
+    def switch_hit_image(self):
+        """切换大型敌机被击中的图片"""
+        # 切换大型敌机被击中的图片的计数器加1
+        self.switch__hit_counter += 1
+        # 如果计数器加到指定的值，才切换一次大型敌机被击中的图片
+        if self.switch__hit_counter == \
+                constants.BIG_ENEMY_SWITCH_HIT_IMAGE_FREQUENCY:
+
+            # 切换到爆炸的第1张图片
+            # 如果是第1张图片
+            # 如果是大型敌机的图片
+            if self.image == self.big_image:
+                # 切换到中型敌机被击中的图片
+                self.image = self.hit_image
+            # 如果是中型敌机被击中的图片
+            elif self.image == self.hit_image:
+                # 切换到中型敌机的图片
+                self.image = self.big_image
+                # 标记中型敌机没有在切换被击中图片
+                self.is_switching_hit_image = False
+            # 计数器重置为0
+            self.switch__hit_counter = 0
+    def play_explode_sound(self):
+        """播放大型敌机爆炸的声音"""
+
+        # 加载大型敌机爆炸的声音文件
+        explode_sound = pygame.mixer.Sound("sounds/big_enemy_explode.wav")
+
+        # 设置爆炸声音的音量
+        explode_sound.set_volume(constants.EXPLODE_SOUND_VOLUME)
+
+        # 播放爆炸的声音
+
+        explode_sound.play()
+
+    def switch_explode_image(self):
+        """切换大型敌机爆炸的图片"""
+        # 切换大型敌机爆炸图片的计数器加1
+        self.switch__explode_counter += 1
+        # 如果计数器加到指定的值，才切换一次大型敌机爆炸的图片
+        if self.switch__explode_counter == \
+                constants.BIG_ENEMY_SWITCH_EXPLODE_IMAGE_FREQUENCY:
+
+            # 切换到爆炸的第1张图片
+            # 如果是第1张图片
+            # 如果是大型敌机的图片
+            if self.image == self.big_image:
+                # 切换到爆炸的第1张图片
+                self.image = self.explode_image1
+            # 如果爆炸的第1张图片
+            elif self.image == self.explode_image1:
+                # 切换到爆炸的第2张图片
+                self.image = self.explode_image2
+            # 如果爆炸的第2张图片
+            elif self.image == self.explode_image2:
+                # 切换到爆炸的第3张图片
+                self.image = self.explode_image3
+            # 如果爆炸的第3张图片
+            elif self.image == self.explode_image3:
+                # 切换到爆炸的第3张图片
+                self.image = self.explode_image4
+
+            # 如果爆炸的第4张图片
+            elif self.image == self.explode_image4:
+                # 切换到爆炸的第5张图片
+                self.image = self.explode_image5
+            # 如果爆炸的第5张图片
+            elif self.image == self.explode_image5:
+                # 切换到爆炸的第6张图片
+                self.image = self.explode_image6
+            # 如果爆炸的第6张图片
+            elif self.image == self.explode_image6:
+                # 将大型敌机从所有分组大删除
+                self.kill()
+            # 计数器重置为0
+            self.switch__explode_counter = 0
+
+    def draw_energy_lines(self):
+        """在大型敌机的尾部上方绘制能量线"""
+
+        # 在大型敌机的尾部上方绘制一条白色线段
+        pygame.draw.line(self.window, (255, 255, 255),
+                         (self.rect.left, self.rect.top),
+                         (self.rect.right, self.rect.top), 5)
+
+        # 剩余能量/初始能量
+        energy_left_ratio = self.energy / constants.BIG_ENEMY_INITIAL_ENERGY
+        # 如果大型敌机还有能量(if self.energy != 0)
+        if energy_left_ratio != 0:
+            # 在大型敌机的尾部上方绘制一条红色线段
+            pygame.draw.line(self.window, (255, 0, 0),
+                             (self.rect.left, self.rect.top),
+                             (self.rect.left + self.rect.width
+                              * (energy_left_ratio),
+                              self.rect.top), 5)
