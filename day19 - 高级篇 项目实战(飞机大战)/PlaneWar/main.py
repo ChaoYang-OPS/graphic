@@ -243,6 +243,10 @@ class PlaneWar:
         # 检测子弹与大型敌机的碰撞
         self._check_collision_bullets_midsorbigs(self.big_enemy_group)
 
+
+        # 检测我方飞机与敌机的碰撞
+        self._check_collision_myplane_enemies()
+
     def _check_collision_bullets_smalls(self):
         """检测子弹与小型敌机的碰撞"""
 
@@ -315,6 +319,36 @@ class PlaneWar:
             if enemy.is_switching_explode_image:
                 # 切换敌机爆炸的图片
                 enemy.switch_explode_image()
+
+
+    def _check_collision_myplane_enemies(self):
+        """检测我方飞机与敌机的碰撞"""
+
+
+        # 检测所有敌机的分组中是否有敌机与我方飞机发生了碰撞
+        list_collided = pygame.sprite.spritecollide(self.my_plane,
+                                                    self.enemy_group,
+                                                    False,
+                                                    pygame.sprite.collide_mask)
+        # 如果检测的有敌机和我方飞机发生了碰撞
+        if len(list_collided) > 0:
+            # 遍历所有发生碰撞的敌机
+            for enemy in list_collided:
+
+                # 如果某架敌机被标记为没有在切换爆炸图片
+                if not enemy.is_switching_explode_image:
+                    # 播放敌机爆炸的声音
+                    enemy.play_explode_sound()
+                    # 标记敌机正在切换爆炸图片
+                    enemy.is_switching_explode_image = True
+
+            # 遍历所有敌机分组中的所有敌机
+            for enemy in self.enemy_group.sprites():
+                # 如果某架敌机被标记为正在切换爆炸图片
+                if enemy.is_switching_explode_image:
+                    # 切换小型敌机爆炸的图片
+                    enemy.switch_explode_image()
+
 
     def _draw_elements(self):
         """在窗口中绘制所有画面元素"""
