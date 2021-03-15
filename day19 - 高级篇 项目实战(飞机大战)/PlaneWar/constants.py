@@ -91,4 +91,12 @@ BIG_ENEMY_INITIAL_ENERGY = 10
 # 间距
 MARGIN = 10
 
+# 36号字体大小
+FONT_SIZE_36 = 36
+
+# 96号字体大小
+FONT_SIZE_96 = 96
+
+# 字体颜色
+WHITE_COLOR = (255, 255, 255)
 

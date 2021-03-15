@@ -38,6 +38,10 @@ class PlaneWar:
         # 标记游戏是否结束
         self.is_game_over = False
 
+        # 获得字体对象
+        self._get_fonts()
+
+
     def get_screen_size(self):
         """获得当前电脑屏幕的尺寸"""
         # 创建一个视频显示信息对象
@@ -118,6 +122,16 @@ class PlaneWar:
 
         # 在事件队列中停止生成自定义事件"创建大型敌机"
         pygame.time.set_timer(constants.ID_OF_CREATE_BIG_ENEMY, 0)
+
+
+    def _get_fonts(self):
+        """获得字体对象"""
+
+        #  获得指定字体和指定字体大小的字体对象
+        self.font_36 = pygame.font.Font("fonts/wawa.ttf", constants.FONT_SIZE_36)
+
+        #  获得指定字体和指定字体大小的字体对象
+        self.font_96 = pygame.font.Font("fonts/wawa.ttf", constants.FONT_SIZE_96)
 
     def run_game(self):
         """运行游戏"""
@@ -427,6 +441,48 @@ class PlaneWar:
             # 在窗口的指定位置绘制我方飞机的生命图片
             self.windows.blit(self.my_plane.life_image, self.my_plane.life_rect_list[i])
 
+        # 如果我方飞机处于无敌状态
+        if self.my_plane.is_invincible:
+            # 在窗口中绘制我方飞机处于无敌状态时的提示文本
+            self._draw_invincible_prompt_text()
+
+        # 如果游戏结束
+        if self.is_game_over:
+            # 在窗口中绘制游戏结束时的提示文本
+            self._draw_game_over_prompt_text()
+
+
+    def _draw_invincible_prompt_text(self):
+        """在窗口中绘制我方飞机处于无敌状态时的提示文本"""
+        # 我方飞机处于无敌状态时的提示文本
+        prompt_text = "还有{}条命，无敌状态将在该文本消息失解除".format(self.my_plane.life_number)
+        # 获得提示文本对应的surface对象
+        prompt_text_surface = self.font_36.render(prompt_text,
+                                                  True, constants.WHITE_COLOR)
+        # 获取提示文本的矩形
+        prompt_text_surface_rect = prompt_text_surface.get_rect()
+
+        # 将提示文本的矩形定位在窗口的中部
+        prompt_text_surface_rect.center = self.windows.get_rect().center
+
+        # 在窗口的中部绘制提示文本
+        self.windows.blit(prompt_text_surface, prompt_text_surface_rect)
+
+    def _draw_game_over_prompt_text(self):
+        """在窗口中绘制游戏结束时的提示文本"""
+        # 游戏结束时的提示文本
+        prompt_text = "游戏结束"
+        # 获得提示文本对应的surface对象
+        prompt_text_surface = self.font_96.render(prompt_text,
+                                                  True, constants.WHITE_COLOR)
+        # 获取提示文本的矩形
+        prompt_text_surface_rect = prompt_text_surface.get_rect()
+
+        # 将提示文本的矩形定位在窗口的中部
+        prompt_text_surface_rect.center = self.windows.get_rect().center
+
+        # 在窗口的中部绘制提示文本
+        self.windows.blit(prompt_text_surface, prompt_text_surface_rect)
     def _update_positions(self):
         """更新窗口中所有画面元素的位置"""
         # 更新我方飞机的位置
