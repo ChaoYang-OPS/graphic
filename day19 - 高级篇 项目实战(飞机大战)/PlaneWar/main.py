@@ -35,6 +35,9 @@ class PlaneWar:
         # 设置定时器
         self._set_timers()
 
+        # 标记游戏是否结束
+        self.is_game_over = False
+
     def get_screen_size(self):
         """获得当前电脑屏幕的尺寸"""
         # 创建一个视频显示信息对象
@@ -101,6 +104,21 @@ class PlaneWar:
         # 在事件队列中每隔一段时间就生成一个自定义事件"创建大型敌机"
         pygame.time.set_timer(constants.ID_OF_CREATE_BIG_ENEMY, constants.INTERVAL_OF_CREATE_BIG_ENEMY)
 
+    def _stop_timers(self):
+        """停止定时器"""
+
+        # 在事件队列中停止生成自定义事件"创建子弹"
+        pygame.time.set_timer(constants.ID_OF_CREATE_BULLET, 0)
+
+        # 在事件队列中停止生成自定义事件"创建小型敌机"
+        pygame.time.set_timer(constants.ID_OF_CREATE_SMALL_ENEMY, 0)
+
+        # 在事件队列中停止生成自定义事件"创建中型敌机"
+        pygame.time.set_timer(constants.ID_OF_CREATE_MID_ENEMY, 0)
+
+        # 在事件队列中停止生成自定义事件"创建大型敌机"
+        pygame.time.set_timer(constants.ID_OF_CREATE_BIG_ENEMY, 0)
+
     def run_game(self):
         """运行游戏"""
         # 初始化pygame库
@@ -112,8 +130,10 @@ class PlaneWar:
             # 设置窗口的背景色
             self.windows.fill(pygame.Color("lightskyblue"))
 
-            # 检测碰撞
-            self._check_collisions()
+            # 如果游戏没有结束
+            if not self.is_game_over:
+                # 检测碰撞
+                self._check_collisions()
 
             # 在窗口中绘制所有画面元素
             self._draw_elements()
@@ -123,14 +143,14 @@ class PlaneWar:
 
             # 设置while循环体在一秒内执行的最大次数(设置动画的最大帧率)
             self.clock.tick(constants.MAX_FRAMERATE)
-            # 更新窗口中所有画面元素的位置
-            self._update_positions()
-
-            # 删除窗口中所有不可见的画面元素
-            self._delete_invisible_elements()
-            # 切换窗口中画面元素的图片
-            self._switch_images()
-
+            # 如果游戏没有结束
+            if not self.is_game_over:
+                # 更新窗口中所有画面元素的位置
+                self._update_positions()
+                # 删除窗口中所有不可见的画面元素
+                self._delete_invisible_elements()
+                # 切换窗口中画面元素的图片
+                self._switch_images()
 
     def _handle_events(self):
         """处理事件"""
@@ -185,6 +205,12 @@ class PlaneWar:
                 self.big_enemy_group.add(big_enemy)
                 # 将创建的大型敌机添加到管理所有敌机的分组中
                 self.enemy_group.add(big_enemy)
+            # 如果某个事件是自定义事件"解除我方飞机的无敌状态"
+            elif event.type == constants.ID_OF_CANCEL_INVINCIBLE:
+                # 解除我方飞机的无敌状态
+                self.my_plane.is_invincible = False
+                # 在事件队列中停止生成自定义事件"解除我方飞机的无敌状态"
+                pygame.time.set_timer(constants.ID_OF_CANCEL_INVINCIBLE, 0)
 
     def _handle_keydown_events(self, event):
         """处理键盘按下的事件"""
@@ -243,6 +269,8 @@ class PlaneWar:
         # 检测子弹与大型敌机的碰撞
         self._check_collision_bullets_midsorbigs(self.big_enemy_group)
 
+        # 检测我方飞机与敌机的碰撞
+        self._check_collision_myplane_enemies()
 
         # 检测我方飞机与敌机的碰撞
         self._check_collision_myplane_enemies()
@@ -306,7 +334,6 @@ class PlaneWar:
                         # 标记敌机正在切换被击中图片
                         enemy.is_switching_hit_image = True
 
-
         # 遍历敌机分组中的所有敌机
         for enemy in self.enemy_group.sprites():
 
@@ -320,18 +347,36 @@ class PlaneWar:
                 # 切换敌机爆炸的图片
                 enemy.switch_explode_image()
 
-
     def _check_collision_myplane_enemies(self):
         """检测我方飞机与敌机的碰撞"""
-
 
         # 检测所有敌机的分组中是否有敌机与我方飞机发生了碰撞
         list_collided = pygame.sprite.spritecollide(self.my_plane,
                                                     self.enemy_group,
-                                                    False,
-                                                    pygame.sprite.collide_mask)
-        # 如果检测的有敌机和我方飞机发生了碰撞
+                                                    False, pygame.sprite.collide_mask)
+        # 如果检测到有敌机和我方飞机发生了碰撞
         if len(list_collided) > 0:
+            # 如果我方飞机不处于无敌状态
+            if not self.my_plane.is_invincible:
+                # 我方飞机的生命数减1
+                self.my_plane.life_number -= 1
+                # 如果我方飞机的生命数大于0
+                if self.my_plane.life_number > 0:
+                    # 重置我方飞机的位置
+                    self.my_plane.reset_position()
+                    # 标记我方飞机处于无敌状态
+                    self.my_plane.is_invincible = True
+                    # 再事件队列中每隔一段时间就生成一个自定义事件"解除我方飞机无敌状态"
+                    pygame.time.set_timer(constants.ID_OF_CANCEL_INVINCIBLE,
+                                          constants.INTERVAL_OF_CANCEL_INVINCIBLE)
+
+                # 如果我方飞机的生命数等于0
+                elif self.my_plane.life_number == 0:
+                    # 标记游戏结束
+                    self.is_game_over = True
+                    # 停止定时器
+                    self._stop_timers()
+
             # 遍历所有发生碰撞的敌机
             for enemy in list_collided:
 
@@ -342,13 +387,12 @@ class PlaneWar:
                     # 标记敌机正在切换爆炸图片
                     enemy.is_switching_explode_image = True
 
-            # 遍历所有敌机分组中的所有敌机
-            for enemy in self.enemy_group.sprites():
-                # 如果某架敌机被标记为正在切换爆炸图片
-                if enemy.is_switching_explode_image:
-                    # 切换小型敌机爆炸的图片
-                    enemy.switch_explode_image()
-
+        # 遍历所有敌机分组中的所有敌机
+        for enemy in self.enemy_group.sprites():
+            # 如果某架敌机被标记为正在切换爆炸图片
+            if enemy.is_switching_explode_image:
+                # 切换敌机爆炸的图片
+                enemy.switch_explode_image()
 
     def _draw_elements(self):
         """在窗口中绘制所有画面元素"""
@@ -377,6 +421,11 @@ class PlaneWar:
         for big_enemy in self.big_enemy_group.sprites():
             # 在中型敌机的尾部上方绘制能量线
             big_enemy.draw_energy_lines()
+
+        # 在窗口中绘制我方飞机的所有生命图片
+        for i in range(self.my_plane.life_number):
+            # 在窗口的指定位置绘制我方飞机的生命图片
+            self.windows.blit(self.my_plane.life_image, self.my_plane.life_rect_list[i])
 
     def _update_positions(self):
         """更新窗口中所有画面元素的位置"""
@@ -420,7 +469,6 @@ class PlaneWar:
             if enemy.rect.top >= self.windows.get_rect().height:
                 # 将该架敌机从管理它的所有分组中删除
                 enemy.kill()
-
 
     def _switch_images(self):
         """切换窗口中画面元素的图片"""

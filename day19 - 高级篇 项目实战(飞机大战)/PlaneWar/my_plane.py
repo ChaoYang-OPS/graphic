@@ -47,6 +47,36 @@ class MyPlane(Sprite):
         self.offset = 20
         # 切换我方飞机图片的计数器
         self.switch_counter = 0
+        # 我方飞机的初始生命数
+        self.life_number = 3
+        # round 取整
+        # 我方飞机的生命图片
+        self.life_image = pygame.transform.scale(self.image1,
+                                                 (round(self.rect.width / 2),
+                                                  round(self.rect.height / 2)))
+
+        # 我方飞机的生命图片矩形的列表
+        self.life_rect_list = []
+
+        # 根据我方飞机的初始生命数，将对应数量的生命图片矩形定位在窗口中
+
+        for i in range(self.life_number):
+            # 获得我方飞机的生命图片矩形
+            life_rect = self.life_image.get_rect()
+            # 设置我方飞机的生命图片矩形的初始位置
+            life_rect.bottom = self.window_rect.height - constants.MARGIN
+
+            life_rect.right = self.window_rect.width - constants.MARGIN - (life_rect.width
+                                                             + constants.MARGIN) * i
+            # 将我方飞机的生命图片矩形添加到列表中
+            self.life_rect_list.append(life_rect)
+
+        # 标记我方飞机不处于无敌状态
+        self.is_invincible = False
+
+
+
+
 
     def update(self):
         """更新我方飞机的位置"""
@@ -90,3 +120,9 @@ class MyPlane(Sprite):
                 self.image = self.image1
             # 计数器重置为0
             self.switch_counter = 0
+
+    def reset_position(self):
+        """重置我方飞机位置"""
+
+        # 设置我方飞机的矩形的初始位置为: 窗口的底部居中位置
+        self.rect.midbottom = self.window_rect.midbottom
