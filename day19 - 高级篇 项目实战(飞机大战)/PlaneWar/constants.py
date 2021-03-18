@@ -21,6 +21,11 @@ ID_OF_CREATE_BULLET = pygame.USEREVENT
 
 INTERVAL_OF_CREATE_BULLET = 500
 
+# 自定义事件"创建子弹补给"的id
+
+ID_OF_CREATE_BULLET_SUPPLY = pygame.USEREVENT + 5
+
+
 # 自定义事件"创建小型敌机"的id
 
 ID_OF_CREATE_SMALL_ENEMY = pygame.USEREVENT + 1
@@ -43,6 +48,9 @@ ID_OF_CANCEL_INVINCIBLE= pygame.USEREVENT + 4
 
 INTERVAL_OF_CREATE_SMALL_ENEMY = 2000
 
+# 自定义事件"创建子弹补给的时间间隔"  25秒
+
+INTERVAL_OF_CREATE_BULLET_SUPPLE = 25000
 
 # 自定义事件"创建中型敌机的时间间隔"
 

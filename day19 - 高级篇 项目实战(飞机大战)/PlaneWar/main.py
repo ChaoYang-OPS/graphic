@@ -9,6 +9,7 @@ from small_enemy import SmallEnemy
 from mid_enemy import MidEnemy
 from big_enemy import BigEnemy
 from pygame.sprite import Group
+from bullet_supply import BulletSupply
 
 import constants
 
@@ -81,6 +82,11 @@ class PlaneWar:
         # 创建一个管理所有子弹的分组
         self.bullet_group = Group()
 
+
+        # 创建一个管理所有子弹补给的分组
+        self.bullet_supply_group = Group()
+
+
         # 创建一个管理所有小型敌机的分组
         self.small_enemy_group = Group()
 
@@ -99,6 +105,9 @@ class PlaneWar:
         # 在事件队列中每隔一段时间就生成一个自定义事件"创建子弹"
         pygame.time.set_timer(constants.ID_OF_CREATE_BULLET, constants.INTERVAL_OF_CREATE_BULLET)
 
+        # 在事件队列中每隔一段时间就生成一个自定义事件"创建子弹补给"
+        pygame.time.set_timer(constants.ID_OF_CREATE_BULLET_SUPPLY, constants.INTERVAL_OF_CREATE_BULLET_SUPPLE)
+
         # 在事件队列中每隔一段时间就生成一个自定义事件"创建小型敌机"
         pygame.time.set_timer(constants.ID_OF_CREATE_SMALL_ENEMY, constants.INTERVAL_OF_CREATE_SMALL_ENEMY)
 
@@ -113,6 +122,10 @@ class PlaneWar:
 
         # 在事件队列中停止生成自定义事件"创建子弹"
         pygame.time.set_timer(constants.ID_OF_CREATE_BULLET, 0)
+
+        # 在事件队列中停止生成自定义事件"创建子弹补给"
+        pygame.time.set_timer(constants.ID_OF_CREATE_BULLET_SUPPLY, 0)
+
 
         # 在事件队列中停止生成自定义事件"创建小型敌机"
         pygame.time.set_timer(constants.ID_OF_CREATE_SMALL_ENEMY, 0)
@@ -192,6 +205,12 @@ class PlaneWar:
                 bullet = Bullet(self.windows, self.my_plane)
                 # 将创建的子弹添加到子弹分组中
                 self.bullet_group.add(bullet)
+            # 如果某个事件是自定义事件"创建子弹补给"
+            elif event.type == constants.ID_OF_CREATE_BULLET_SUPPLY:
+                # 创建一个子弹补给
+                bullet_supply = BulletSupply(self.windows)
+                # 将创建的子弹补给添加到子弹补给分组中
+                self.bullet_supply_group.add(bullet_supply)
 
             # 如果某个事件是自定义事件"创建小型敌机"
             elif event.type == constants.ID_OF_CREATE_SMALL_ENEMY:
@@ -415,6 +434,9 @@ class PlaneWar:
         # 在窗口中绘制所有子弹
         self.bullet_group.draw(self.windows)
 
+        # 在窗口中绘制所有子弹补给
+        self.bullet_supply_group.draw(self.windows)
+
         # 在窗口中绘制所有小型敌机
         self.small_enemy_group.draw(self.windows)
 
@@ -490,6 +512,9 @@ class PlaneWar:
         # 更新所有子弹的位置
         self.bullet_group.update()
 
+        # 更新所有子弹补给的位置
+        self.bullet_supply_group.update()
+
         # 更新所有小型敌机的位置
         self.small_enemy_group.update()
 
@@ -505,8 +530,11 @@ class PlaneWar:
         # 删除窗口中所有不可见的子弹
         self._delete_invisible_bullets()
 
+        # 删除窗口中所有不可见的子弹补给
+        self._delete_invisible_enemies_supplies(self.bullet_supply_group)
+
         # 删除窗口中所有不可见的敌机
-        self._delete_invisible_enemies()
+        self._delete_invisible_enemies_supplies(self.enemy_group)
 
     def _delete_invisible_bullets(self):
         """删除窗口中所有不可见的子弹"""
@@ -517,14 +545,14 @@ class PlaneWar:
                 # 从子弹分组中删除该颗子弹
                 self.bullet_group.remove(bullet)
 
-    def _delete_invisible_enemies(self):
-        """删除窗口中所有不可见的敌机"""
-        # 遍历管理所有敌机分组
-        for enemy in self.enemy_group.sprites():
-            # 如果某架敌机在窗口中不可见了
-            if enemy.rect.top >= self.windows.get_rect().height:
-                # 将该架敌机从管理它的所有分组中删除
-                enemy.kill()
+    def _delete_invisible_enemies_supplies(self, group):
+        """删除窗口中所有不可见的敌机或子弹补给"""
+        # 遍历管理所有敌机分组或子弹补给分组
+        for sprite in group.sprites():
+            # 如果某架敌机或某个子弹补给在窗口中不可见了
+            if sprite.rect.top >= self.windows.get_rect().height:
+                # 将该架敌机或子弹补给从管理它的所有分组中删除
+                sprite.kill()
 
     def _switch_images(self):
         """切换窗口中画面元素的图片"""
