@@ -17,9 +17,19 @@ MAX_FRAMERATE = 30
 
 ID_OF_CREATE_BULLET = pygame.USEREVENT
 
+
+# 自定义事件"双方子弹"的id
+
+ID_OF_CREATE_DOUBLE_BULLET = pygame.USEREVENT + 6
+
 # 自定义事件"创建子弹的时间间隔"
 
 INTERVAL_OF_CREATE_BULLET = 500
+
+
+# 自定义事件"创建双方子弹的时间间隔"
+
+INTERVAL_OF_CREATE_DOUBLE_BULLET = 500
 
 # 自定义事件"创建子弹补给"的id
 
@@ -84,6 +94,10 @@ BIG_ENEMY_SWITCH_EXPLODE_IMAGE_FREQUENCY = 3
 # 爆炸声音的音量
 EXPLODE_SOUND_VOLUME = 0.8
 
+
+# 碰撞声音的音量
+COLLIDE_SOUND_VOLUME = 0.8
+
 # 中型敌机的初始能量
 MID_ENEMY_INITIAL_ENERGY = 5
 
@@ -107,4 +121,10 @@ FONT_SIZE_96 = 96
 
 # 字体颜色
 WHITE_COLOR = (255, 255, 255)
+
+
+# 双发子弹在水平方向上距离我方飞机中心的偏移量
+DOUBLE_BULLET_OFFSET = 32
+#  双发子弹的最大值
+DOUBLE_BULLET_COUNTER_MAX = 16
 

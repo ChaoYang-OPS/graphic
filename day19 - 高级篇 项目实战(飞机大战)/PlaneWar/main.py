@@ -10,6 +10,7 @@ from mid_enemy import MidEnemy
 from big_enemy import BigEnemy
 from pygame.sprite import Group
 from bullet_supply import BulletSupply
+from double_bullet import DoubleBullet
 
 import constants
 
@@ -41,6 +42,10 @@ class PlaneWar:
 
         # 获得字体对象
         self._get_fonts()
+
+
+        # 双发子弹的计数器
+        self.double_bullet_counter = 0
 
 
     def get_screen_size(self):
@@ -83,6 +88,10 @@ class PlaneWar:
         self.bullet_group = Group()
 
 
+        # 创建一个管理所有双发子弹的分组
+        self.double_bullet_group = Group()
+
+
         # 创建一个管理所有子弹补给的分组
         self.bullet_supply_group = Group()
 
@@ -98,6 +107,9 @@ class PlaneWar:
 
         # 创建一个管理所有敌机的分组
         self.enemy_group = Group()
+
+
+
 
     def _set_timers(self):
         """设置定时器"""
@@ -122,6 +134,9 @@ class PlaneWar:
 
         # 在事件队列中停止生成自定义事件"创建子弹"
         pygame.time.set_timer(constants.ID_OF_CREATE_BULLET, 0)
+
+        # 在事件队列中停止生成自定义事件"创建双发子弹"
+        pygame.time.set_timer(constants.ID_OF_CREATE_DOUBLE_BULLET, 0)
 
         # 在事件队列中停止生成自定义事件"创建子弹补给"
         pygame.time.set_timer(constants.ID_OF_CREATE_BULLET_SUPPLY, 0)
@@ -205,6 +220,14 @@ class PlaneWar:
                 bullet = Bullet(self.windows, self.my_plane)
                 # 将创建的子弹添加到子弹分组中
                 self.bullet_group.add(bullet)
+
+            # 如果某个事件是自定义事件"创建双发子弹"
+            elif event.type == constants.ID_OF_CREATE_DOUBLE_BULLET:
+                # 创建两颗双发子弹
+                self._create_two_double_bullets()
+
+                pass
+
             # 如果某个事件是自定义事件"创建子弹补给"
             elif event.type == constants.ID_OF_CREATE_BULLET_SUPPLY:
                 # 创建一个子弹补给
@@ -291,6 +314,50 @@ class PlaneWar:
             # 标记我方飞机不向右移动
             self.my_plane.is_move_right = False
 
+
+
+    def _create_two_double_bullets(self):
+        """创建两颗双发子弹"""
+        # 双发子弹计数器加1
+        self.double_bullet_counter += 1
+
+        # 如果双发子弹计数器的值没有达到最大值
+        if self.double_bullet_counter != constants.DOUBLE_BULLET_COUNTER_MAX:
+
+            # 创建一颗位于我方飞机左翼的双发子弹
+            double_bullet1 = DoubleBullet(self.windows, self.my_plane)
+
+            # 设置我方飞机左翼的双发子弹初始位置
+            double_bullet1.rect.center = (self.my_plane.rect.centerx - constants.DOUBLE_BULLET_OFFSET,
+                                          self.my_plane.rect.centery)
+
+            # 创建一颗位于我方飞机右翼的双发子弹
+            double_bullet2 = DoubleBullet(self.windows, self.my_plane)
+
+            # 设置我方飞机右翼的双发子弹初始位置
+            double_bullet2.rect.center = (self.my_plane.rect.centerx + constants.DOUBLE_BULLET_OFFSET,
+                                          self.my_plane.rect.centery)
+
+            # 将创建的两颗双发子弹添加到管理所有双发子弹的分组中
+            self.double_bullet_group.add(double_bullet1)
+            self.double_bullet_group.add(double_bullet2)
+        # 如果双发子弹的计数器达到最大值
+        else:
+            # 在事件队列中每隔一段时间就生成一个自定义事件"创建子弹"
+            pygame.time.set_timer(constants.ID_OF_CREATE_BULLET,
+                                  constants.INTERVAL_OF_CREATE_BULLET)
+
+            # 在事件队列中停止生成自定义事件"创建双发子弹"
+            pygame.time.set_timer(constants.ID_OF_CREATE_DOUBLE_BULLET, 0)
+
+            # 双发子弹的计数器重置为0
+            self.double_bullet_counter = 0
+
+
+
+
+
+
     def _check_collisions(self):
         """检测碰撞"""
         # 检测子弹与小型敌机的碰撞
@@ -307,6 +374,8 @@ class PlaneWar:
 
         # 检测我方飞机与敌机的碰撞
         self._check_collision_myplane_enemies()
+        # 检测我方飞机与子弹补给的碰撞
+        self._check_collision_myplane_bulletsupply()
 
     def _check_collision_bullets_smalls(self):
         """检测子弹与小型敌机的碰撞"""
@@ -402,6 +471,11 @@ class PlaneWar:
                     # 再事件队列中每隔一段时间就生成一个自定义事件"解除我方飞机无敌状态"
                     pygame.time.set_timer(constants.ID_OF_CANCEL_INVINCIBLE,
                                           constants.INTERVAL_OF_CANCEL_INVINCIBLE)
+                    # 在事件队列中停止生成自定义事件"创建双发子弹"
+                    pygame.time.set_timer(constants.ID_OF_CREATE_DOUBLE_BULLET, 0)
+                    # 再事件队列中每隔一段时间就生成一个自定义事件"创建子弹"
+                    pygame.time.set_timer(constants.ID_OF_CREATE_BULLET,
+                                          constants.INTERVAL_OF_CREATE_BULLET)
 
                 # 如果我方飞机的生命数等于0
                 elif self.my_plane.life_number == 0:
@@ -433,6 +507,10 @@ class PlaneWar:
         self.my_plane.draw()
         # 在窗口中绘制所有子弹
         self.bullet_group.draw(self.windows)
+
+        # 在窗口中绘制所有双发子弹
+        self.double_bullet_group.draw(self.windows)
+
 
         # 在窗口中绘制所有子弹补给
         self.bullet_supply_group.draw(self.windows)
@@ -473,6 +551,29 @@ class PlaneWar:
             # 在窗口中绘制游戏结束时的提示文本
             self._draw_game_over_prompt_text()
 
+    def _check_collision_myplane_bulletsupply(self):
+        """检测我方飞机与子弹补给的碰撞"""
+        # 检测所有子弹补给的分组中是否有子弹补给与我方飞机发生了碰撞
+        list_collided = pygame.sprite.spritecollide(self.my_plane,
+                                                    self.bullet_supply_group,
+                                                    False, pygame.sprite.collide_mask)
+
+        # 如果检测到有子弹补给和我方飞机发生了碰撞
+        if len(list_collided) > 0:
+            # 遍历所有发生碰撞的子弹补给
+            for bullet_supply in list_collided:
+                # 播放子弹与我方飞机碰撞的声音
+                bullet_supply.play_collide_sound()
+                # 将子弹补给从管理它的所有分组中删除
+                bullet_supply.kill()
+            # 在事件队列中停止生成自定义事件"创建子弹"
+            pygame.time.set_timer(constants.ID_OF_CREATE_BULLET, 0)
+            # 在事件队列中每隔一段时间就生成一个自定义事件"创建双发子弹"
+            pygame.time.set_timer(constants.ID_OF_CREATE_DOUBLE_BULLET,
+                                  constants.INTERVAL_OF_CREATE_DOUBLE_BULLET)
+            # 双发子弹的计数器重置为0
+            self.double_bullet_counter = 0
+
 
     def _draw_invincible_prompt_text(self):
         """在窗口中绘制我方飞机处于无敌状态时的提示文本"""
@@ -512,6 +613,11 @@ class PlaneWar:
         # 更新所有子弹的位置
         self.bullet_group.update()
 
+
+        # 更新所有双发子弹的位置
+        self.double_bullet_group.update()
+
+
         # 更新所有子弹补给的位置
         self.bullet_supply_group.update()
 
@@ -528,7 +634,12 @@ class PlaneWar:
         """删除窗口中所有不可见的画面元素"""
 
         # 删除窗口中所有不可见的子弹
-        self._delete_invisible_bullets()
+
+        self._delete_invisible_bullets_or_double(self.bullet_group)
+
+        # 删除窗口中所有不可见的双发子弹
+
+        self._delete_invisible_bullets_or_double(self.double_bullet_group)
 
         # 删除窗口中所有不可见的子弹补给
         self._delete_invisible_enemies_supplies(self.bullet_supply_group)
@@ -536,14 +647,14 @@ class PlaneWar:
         # 删除窗口中所有不可见的敌机
         self._delete_invisible_enemies_supplies(self.enemy_group)
 
-    def _delete_invisible_bullets(self):
-        """删除窗口中所有不可见的子弹"""
-        # 遍历子弹分组
-        for bullet in self.bullet_group.sprites():
-            # 如果某颗子弹在窗口中不可见了
-            if bullet.rect.bottom <= 0:
-                # 从子弹分组中删除该颗子弹
-                self.bullet_group.remove(bullet)
+    def _delete_invisible_bullets_or_double(self, group):
+        """删除窗口中所有不可见的子弹或双发子弹"""
+        # 遍历子弹或双发子弹分组
+        for sprite in group.sprites():
+            # 如果某颗子弹或双发子弹在窗口中不可见了
+            if sprite.rect.bottom <= 0:
+                # 从管理它的所有分组中删除
+                sprite.kill()
 
     def _delete_invisible_enemies_supplies(self, group):
         """删除窗口中所有不可见的敌机或子弹补给"""
