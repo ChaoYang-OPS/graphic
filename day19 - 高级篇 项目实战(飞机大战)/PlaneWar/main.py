@@ -12,6 +12,7 @@ from pygame.sprite import Group
 from bullet_supply import BulletSupply
 from double_bullet import DoubleBullet
 from bomb_supply import BombSupply
+from visual_bomb_group import VisualBombGroup
 
 import constants
 
@@ -29,7 +30,11 @@ class PlaneWar:
         # 设置窗口
         self._set_window()
         # 创建一架我方飞机
+
         self.my_plane = MyPlane(self.windows)
+
+        # 创建一个可视化炸弹组
+        self.visual_bomb_group = VisualBombGroup(self.windows)
 
         # 创建管理精灵的分组
         self._create_groups()
@@ -44,10 +49,8 @@ class PlaneWar:
         # 获得字体对象
         self._get_fonts()
 
-
         # 双发子弹的计数器
         self.double_bullet_counter = 0
-
 
     def get_screen_size(self):
         """获得当前电脑屏幕的尺寸"""
@@ -88,17 +91,14 @@ class PlaneWar:
         # 创建一个管理所有子弹的分组
         self.bullet_group = Group()
 
-
         # 创建一个管理所有双发子弹的分组
         self.double_bullet_group = Group()
 
         # 创建一个管理所有炸弹补给的分组
         self.bomb_supply_group = Group()
 
-
         # 创建一个管理所有子弹补给的分组
         self.bullet_supply_group = Group()
-
 
         # 创建一个管理所有小型敌机的分组
         self.small_enemy_group = Group()
@@ -111,9 +111,6 @@ class PlaneWar:
 
         # 创建一个管理所有敌机的分组
         self.enemy_group = Group()
-
-
-
 
     def _set_timers(self):
         """设置定时器"""
@@ -151,7 +148,6 @@ class PlaneWar:
         # 在事件队列中停止生成自定义事件"创建炸弹补给"
         pygame.time.set_timer(constants.ID_OF_CREATE_BOMB_SUPPLY, 0)
 
-
         # 在事件队列中停止生成自定义事件"创建小型敌机"
         pygame.time.set_timer(constants.ID_OF_CREATE_SMALL_ENEMY, 0)
 
@@ -160,7 +156,6 @@ class PlaneWar:
 
         # 在事件队列中停止生成自定义事件"创建大型敌机"
         pygame.time.set_timer(constants.ID_OF_CREATE_BIG_ENEMY, 0)
-
 
     def _get_fonts(self):
         """获得字体对象"""
@@ -203,6 +198,22 @@ class PlaneWar:
                 self._delete_invisible_elements()
                 # 切换窗口中画面元素的图片
                 self._switch_images()
+
+    def _launch_bomb(self):
+        """发射一颗炸弹"""
+
+        # 播放炸弹爆炸的声音
+        self.visual_bomb_group.play_explode_sound()
+
+        # 销毁游戏画面中的所有敌机
+
+        self.small_enemy_group.empty()
+        self.mid_enemy_group.empty()
+        self.big_enemy_group.empty()
+        self.enemy_group.empty()
+
+        # 炸弹的个数减1
+        self.visual_bomb_group.bomb_number -= 1
 
     def _handle_events(self):
         """处理事件"""
@@ -301,6 +312,16 @@ class PlaneWar:
         elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
             # 标记我方飞机向右移动
             self.my_plane.is_move_right = True
+
+        # 如果按下的是空格键
+        elif event.key == pygame.K_SPACE:
+            # 如果游戏没有结束，并且炸弹的数据大于0
+            if (not self.is_game_over) and \
+                    self.visual_bomb_group.bomb_number > 0:
+                # 发射一颗炸弹
+                self._launch_bomb()
+
+
         # 如果按下的键是Esc键
         elif event.key == pygame.K_ESCAPE:
 
@@ -328,8 +349,6 @@ class PlaneWar:
         elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
             # 标记我方飞机不向右移动
             self.my_plane.is_move_right = False
-
-
 
     def _create_two_double_bullets(self):
         """创建两颗双发子弹"""
@@ -368,11 +387,6 @@ class PlaneWar:
             # 双发子弹的计数器重置为0
             self.double_bullet_counter = 0
 
-
-
-
-
-
     def _check_collisions(self):
         """检测碰撞"""
         # 检测子弹与小型敌机的碰撞
@@ -387,7 +401,6 @@ class PlaneWar:
         # 检测子弹与大型敌机的碰撞
         self._check_collision_bullets_or_double_midsorbigs(self.bullet_group, self.big_enemy_group)
 
-
         # 检测双发子弹与中型敌机的碰撞
         self._check_collision_bullets_or_double_midsorbigs(self.double_bullet_group, self.mid_enemy_group)
 
@@ -401,6 +414,8 @@ class PlaneWar:
         self._check_collision_myplane_enemies()
         # 检测我方飞机与子弹补给的碰撞
         self._check_collision_myplane_bulletsupply()
+        # 检测我方飞机与炸弹补给的碰撞
+        self._check_collision_myplane_bombsupply()
 
     def _check_collision_bullets_or_double_smalls(self, group):
         """检测子弹或双发子弹与小型敌机的碰撞"""
@@ -429,7 +444,7 @@ class PlaneWar:
                 # 切换小型敌机爆炸的图片
                 small_enemy.switch_explode_image()
 
-    def _check_collision_bullets_or_double_midsorbigs(self, blt_group,enemy_group):
+    def _check_collision_bullets_or_double_midsorbigs(self, blt_group, enemy_group):
         """检测子弹或双发子弹与中型敌机或大型敌机的碰撞"""
 
         # 检测是否有子弹或双发子弹与敌机发生了碰撞
@@ -462,7 +477,6 @@ class PlaneWar:
                             if enemy.energy == -1:
                                 # 将敌机的能量设置为0
                                 enemy.energy = 0
-
 
                 # 如果敌机的能量等于0
                 if enemy.energy == 0:
@@ -555,10 +569,8 @@ class PlaneWar:
         # 在窗口中绘制所有双发子弹
         self.double_bullet_group.draw(self.windows)
 
-
         # 在窗口中绘制所有子弹补给
         self.bullet_supply_group.draw(self.windows)
-
 
         # 在窗口中绘制所有炸弹补给
         self.bomb_supply_group.draw(self.windows)
@@ -588,6 +600,13 @@ class PlaneWar:
         for i in range(self.my_plane.life_number):
             # 在窗口的指定位置绘制我方飞机的生命图片
             self.windows.blit(self.my_plane.life_image, self.my_plane.life_rect_list[i])
+
+        # 在窗口中绘制可视化炸弹组的所有炸弹图片
+
+        for i in range(self.visual_bomb_group.bomb_number):
+            # 在窗口的指定位置绘制炸弹图片
+            self.windows.blit(self.visual_bomb_group.bomb_image,
+                              self.visual_bomb_group.bomb_rect_list[i])
 
         # 如果我方飞机处于无敌状态
         if self.my_plane.is_invincible:
@@ -622,6 +641,27 @@ class PlaneWar:
             # 双发子弹的计数器重置为0
             self.double_bullet_counter = 0
 
+    def _check_collision_myplane_bombsupply(self):
+        """检测我方飞机与炸弹补给的碰撞"""
+        # 检测所有炸弹补给的分组中是否有炸弹补给与我方飞机发生了碰撞
+        list_collided = pygame.sprite.spritecollide(self.my_plane,
+                                                    self.bomb_supply_group,
+                                                    False, pygame.sprite.collide_mask)
+
+        # 如果检测到有炸弹补给和我方飞机发生了碰撞
+        if len(list_collided) > 0:
+            # 遍历所有发生碰撞的炸弹补给
+            for bomb_supply in list_collided:
+                # 播放炸弹与我方飞机碰撞的声音
+                bomb_supply.play_collide_sound()
+                # 将炸弹补给从管理它的所有分组中删除
+                bomb_supply.kill()
+                # 如果炸弹的数量小于3
+                if self.visual_bomb_group.bomb_number < 3:
+                    # 炸弹数量加1
+                    self.visual_bomb_group.bomb_number += 1
+
+
 
     def _draw_invincible_prompt_text(self):
         """在窗口中绘制我方飞机处于无敌状态时的提示文本"""
@@ -654,6 +694,7 @@ class PlaneWar:
 
         # 在窗口的中部绘制提示文本
         self.windows.blit(prompt_text_surface, prompt_text_surface_rect)
+
     def _update_positions(self):
         """更新窗口中所有画面元素的位置"""
         # 更新我方飞机的位置
@@ -661,10 +702,8 @@ class PlaneWar:
         # 更新所有子弹的位置
         self.bullet_group.update()
 
-
         # 更新所有双发子弹的位置
         self.double_bullet_group.update()
-
 
         # 更新所有子弹补给的位置
         self.bullet_supply_group.update()

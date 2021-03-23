@@ -2,6 +2,7 @@
 import random
 import pygame
 from pygame.sprite import Sprite
+import constants
 
 
 class BombSupply(Sprite):
@@ -38,3 +39,16 @@ class BombSupply(Sprite):
 
         # 增大炸弹补给的属性top以向下移动
         self.rect.top += self.offset
+
+    def play_collide_sound(self):
+        """播放炸弹补给和我方飞机碰撞的声音"""
+
+        # 加载炸弹补给碰撞的声音文件
+        collide_sound = pygame.mixer.Sound("sounds/bomb_supply_collide.wav")
+
+        # 设置碰撞声音的音量
+        collide_sound.set_volume(constants.COLLIDE_SOUND_VOLUME)
+
+        # 播放碰撞的声音
+
+        collide_sound.play()
