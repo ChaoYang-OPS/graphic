@@ -13,6 +13,7 @@ from bullet_supply import BulletSupply
 from double_bullet import DoubleBullet
 from bomb_supply import BombSupply
 from visual_bomb_group import VisualBombGroup
+from score_board import ScoreBoard
 
 import constants
 
@@ -35,6 +36,8 @@ class PlaneWar:
 
         # 创建一个可视化炸弹组
         self.visual_bomb_group = VisualBombGroup(self.windows)
+        # 创建一个得分板
+        self.score_board = ScoreBoard(self.windows)
 
         # 创建管理精灵的分组
         self._create_groups()
@@ -157,6 +160,21 @@ class PlaneWar:
         # 在事件队列中停止生成自定义事件"创建大型敌机"
         pygame.time.set_timer(constants.ID_OF_CREATE_BIG_ENEMY, 0)
 
+    def _update_current_score(self, enemy):
+        """根据摧毁的敌机更新当前得分"""
+        # 如果摧毁的敌机是小型敌机
+        if type(enemy) == SmallEnemy:
+            # 当前得分加上摧毁小型敌机后的得分
+            self.score_board.current_score += constants.DESTROY_SMALL_ENEMY_SCORE
+        # 如果摧毁的敌机是中型敌机
+        elif type(enemy) == MidEnemy:
+            # 当前得分加上摧毁中型敌机后的得分
+            self.score_board.current_score += constants.DESTROY_MID_ENEMY_SCORE
+        # 如果摧毁的敌机是大型敌机
+        elif type(enemy) == BigEnemy:
+            # 当前得分加上摧毁大型敌机后的得分
+            self.score_board.current_score += constants.DESTROY_BIG_ENEMY_SCORE
+
     def _get_fonts(self):
         """获得字体对象"""
 
@@ -205,12 +223,12 @@ class PlaneWar:
         # 播放炸弹爆炸的声音
         self.visual_bomb_group.play_explode_sound()
 
-        # 销毁游戏画面中的所有敌机
-
-        self.small_enemy_group.empty()
-        self.mid_enemy_group.empty()
-        self.big_enemy_group.empty()
-        self.enemy_group.empty()
+        # 遍历管理所有敌机的分组
+        for enemy in self.enemy_group.sprites():
+            # 根据摧毁的敌机更新当前得分
+            self._update_current_score(enemy)
+            # 将敌机从管理它的所有分组中删除
+            enemy.kill()
 
         # 炸弹的个数减1
         self.visual_bomb_group.bomb_number -= 1
@@ -432,6 +450,8 @@ class PlaneWar:
 
                 # 如果某架小型敌机被标记为没有在切换爆炸图片
                 if not small_enemy.is_switching_explode_image:
+                    # 根据摧毁的敌机更新当前得分
+                    self._update_current_score(small_enemy)
                     # 播放小型敌机爆炸的声音
                     small_enemy.play_explode_sound()
                     # 标记小型敌机正在切换爆炸图片
@@ -483,6 +503,8 @@ class PlaneWar:
 
                     # 如果某架敌机被标记为没有在切换爆炸图片
                     if not enemy.is_switching_explode_image:
+                        # 根据摧毁的敌机更新当前得分
+                        self._update_current_score(enemy)
                         # 播放敌机爆炸的声音
                         enemy.play_explode_sound()
                         # 标记敌机正 在切换爆炸图片
@@ -547,6 +569,8 @@ class PlaneWar:
 
                 # 如果某架敌机被标记为没有在切换爆炸图片
                 if not enemy.is_switching_explode_image:
+                    # 根据摧毁的敌机更新当前得分
+                    self._update_current_score(enemy)
                     # 播放敌机爆炸的声音
                     enemy.play_explode_sound()
                     # 标记敌机正在切换爆炸图片
@@ -617,6 +641,8 @@ class PlaneWar:
         if self.is_game_over:
             # 在窗口中绘制游戏结束时的提示文本
             self._draw_game_over_prompt_text()
+        # 在得分板中绘制当前得分
+        self.score_board.draw_current_score()
 
     def _check_collision_myplane_bulletsupply(self):
         """检测我方飞机与子弹补给的碰撞"""
@@ -660,8 +686,6 @@ class PlaneWar:
                 if self.visual_bomb_group.bomb_number < 3:
                     # 炸弹数量加1
                     self.visual_bomb_group.bomb_number += 1
-
-
 
     def _draw_invincible_prompt_text(self):
         """在窗口中绘制我方飞机处于无敌状态时的提示文本"""
