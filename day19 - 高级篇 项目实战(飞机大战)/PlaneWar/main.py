@@ -227,6 +227,8 @@ class PlaneWar:
         for enemy in self.enemy_group.sprites():
             # 根据摧毁的敌机更新当前得分
             self._update_current_score(enemy)
+            # 根据当前得分来更新当前关数
+            self.score_board.update_current_level()
             # 将敌机从管理它的所有分组中删除
             enemy.kill()
 
@@ -241,6 +243,13 @@ class PlaneWar:
 
             # 退出程序
             if event.type == pygame.QUIT:
+                # 如果当前得分大于保存的最高得分
+                if self.score_board.current_score \
+                        > self.score_board.highest_score:
+                    # 保存当前得分
+                    self.score_board.save_current_score()
+
+
                 # 卸载pygame库
                 pygame.quit()
                 # 退出程序
@@ -342,6 +351,12 @@ class PlaneWar:
 
         # 如果按下的键是Esc键
         elif event.key == pygame.K_ESCAPE:
+
+            # 如果当前得分大于保存的最高得分
+            if self.score_board.current_score \
+                    > self.score_board.highest_score:
+                # 保存当前得分
+                self.score_board.save_current_score()
 
             # 卸载pygame库
             pygame.quit()
@@ -452,6 +467,8 @@ class PlaneWar:
                 if not small_enemy.is_switching_explode_image:
                     # 根据摧毁的敌机更新当前得分
                     self._update_current_score(small_enemy)
+                    # 根据当前得分来更新当前关数
+                    self.score_board.update_current_level()
                     # 播放小型敌机爆炸的声音
                     small_enemy.play_explode_sound()
                     # 标记小型敌机正在切换爆炸图片
@@ -505,6 +522,9 @@ class PlaneWar:
                     if not enemy.is_switching_explode_image:
                         # 根据摧毁的敌机更新当前得分
                         self._update_current_score(enemy)
+
+                        # 根据当前得分来更新当前关数
+                        self.score_board.update_current_level()
                         # 播放敌机爆炸的声音
                         enemy.play_explode_sound()
                         # 标记敌机正 在切换爆炸图片
@@ -571,6 +591,8 @@ class PlaneWar:
                 if not enemy.is_switching_explode_image:
                     # 根据摧毁的敌机更新当前得分
                     self._update_current_score(enemy)
+                    # 根据当前得分来更新当前关数
+                    self.score_board.update_current_level()
                     # 播放敌机爆炸的声音
                     enemy.play_explode_sound()
                     # 标记敌机正在切换爆炸图片
@@ -643,6 +665,12 @@ class PlaneWar:
             self._draw_game_over_prompt_text()
         # 在得分板中绘制当前得分
         self.score_board.draw_current_score()
+
+        # 在得分板中绘制最高得分
+        self.score_board.draw_highest_score()
+
+        # 在得分板中绘制关数
+        self.score_board.draw_current_level()
 
     def _check_collision_myplane_bulletsupply(self):
         """检测我方飞机与子弹补给的碰撞"""

@@ -147,3 +147,23 @@ DESTROY_BIG_ENEMY_SCORE = 100
 
 
 
+
+# 关数1的得分最大值
+
+LEVEL1_SCORE_MAX = 200
+
+# 关数2的得分最大值
+
+LEVEL2_SCORE_MAX = 400
+
+# 关数3的得分最大值
+
+LEVEL3_SCORE_MAX = 600
+
+# 关数4的得分最大值
+
+LEVEL4_SCORE_MAX = 800
+
+
+
+
