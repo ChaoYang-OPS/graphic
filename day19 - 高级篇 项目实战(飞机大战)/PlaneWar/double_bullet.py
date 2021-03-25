@@ -6,6 +6,9 @@ from pygame.sprite import Sprite
 class DoubleBullet(Sprite):
     """双发子弹类"""
 
+    # 双发子弹每次移动时的偏移量
+    offset = 50
+
     def __init__(self, window, my_plane):
         """初始化双发子弹"""
 
@@ -24,10 +27,13 @@ class DoubleBullet(Sprite):
         self.my_plane_rect = my_plane.rect
 
 
-        # 双发子弹每次移动时的偏移量
-        self.offset = 50
+    @classmethod
+    def update_offset(cls, pixels):
+        """更新小型敌机每次移动时的偏移量"""
+        # 小型敌机每次移动时的偏移量增加指定的像素数
+        DoubleBullet.offset += pixels
 
     def update(self):
         """更新双发子弹的位置"""
-        self.rect.top -= self.offset
+        self.rect.top -= DoubleBullet.offset
 

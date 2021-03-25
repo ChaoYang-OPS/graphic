@@ -106,6 +106,10 @@ EXPLODE_SOUND_VOLUME = 0.8
 # 碰撞声音的音量
 COLLIDE_SOUND_VOLUME = 0.8
 
+
+# 背景音乐的音量
+BGM_SOUND_VOLUME = 0.3
+
 # 中型敌机的初始能量
 MID_ENEMY_INITIAL_ENERGY = 5
 
@@ -163,6 +167,10 @@ LEVEL3_SCORE_MAX = 600
 # 关数4的得分最大值
 
 LEVEL4_SCORE_MAX = 800
+
+
+
+
 
 
 

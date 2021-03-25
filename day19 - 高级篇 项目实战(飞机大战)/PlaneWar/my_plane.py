@@ -9,6 +9,9 @@ import constants
 class MyPlane(Sprite):
     """我方飞机类"""
 
+    # 我方飞机每次移动时的偏移量
+    offset = 20
+
     def __init__(self, window):
         """初始化我方飞机"""
 
@@ -43,8 +46,7 @@ class MyPlane(Sprite):
 
         # 标记我方飞机不向右移动
         self.is_move_right = False
-        # 我方飞机每次移动时的偏移量
-        self.offset = 20
+
         # 切换我方飞机图片的计数器
         self.switch_counter = 0
         # 我方飞机的初始生命数
@@ -81,21 +83,21 @@ class MyPlane(Sprite):
     def update(self):
         """更新我方飞机的位置"""
         # 如果我方飞机被标记为向上移动，并且向上移动后不会超出窗口的上边缘
-        if self.is_move_up and self.rect.top - self.offset > 0:
-            self.rect.top -= self.offset
+        if self.is_move_up and self.rect.top - MyPlane.offset > 0:
+            self.rect.top -= MyPlane.offset
         # 如果我方飞机被标记为向下移动,并且向下移动后不会超出窗口的下边缘
-        if self.is_move_down and self.rect.bottom + self.offset < \
+        if self.is_move_down and self.rect.bottom + MyPlane.offset < \
                 self.window_rect.height:
             # 增大我方飞机的矩形属性bottom以向下移动
-            self.rect.bottom += self.offset
+            self.rect.bottom += MyPlane.offset
         # 如果我方飞机被标记为向左移动,并且向左移动后不会超出窗口的左边缘
-        if self.is_move_left and self.rect.left - self.offset > 0:
+        if self.is_move_left and self.rect.left - MyPlane.offset > 0:
             # 减少我方飞机的矩形属性left以向左移动
-            self.rect.left -= self.offset
+            self.rect.left -= MyPlane.offset
         # 如果我方飞机被标记为向右移动,并且向右移动后不会超出窗口的右边缘
-        if self.is_move_right and self.rect.right + self.offset < self.window_rect.width:
+        if self.is_move_right and self.rect.right + MyPlane.offset < self.window_rect.width:
             # 增大我方飞机的矩形属性right以向右移动
-            self.rect.right += self.offset
+            self.rect.right += MyPlane.offset
 
     def draw(self):
         """再窗口中绘制我方飞机"""

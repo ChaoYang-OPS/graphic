@@ -39,6 +39,10 @@ class PlaneWar:
         # 创建一个得分板
         self.score_board = ScoreBoard(self.windows)
 
+        # 播放背景音乐
+
+        self._play_bg_music()
+
         # 创建管理精灵的分组
         self._create_groups()
         # 创建一个用于跟踪时间的时钟对象
@@ -54,6 +58,18 @@ class PlaneWar:
 
         # 双发子弹的计数器
         self.double_bullet_counter = 0
+
+        # 标记还没有更新关数2的速度
+        self.is_update_level2_speed = False
+
+        # 标记还没有更新关数3的速度
+        self.is_update_level3_speed = False
+
+        # 标记还没有更新关数4的速度
+        self.is_update_level4_speed = False
+
+        # 标记还没有更新关数5的速度
+        self.is_update_level5_speed = False
 
     def get_screen_size(self):
         """获得当前电脑屏幕的尺寸"""
@@ -229,6 +245,8 @@ class PlaneWar:
             self._update_current_score(enemy)
             # 根据当前得分来更新当前关数
             self.score_board.update_current_level()
+            # 根据当前关数更新所有敌机补给的速度
+            self._update_enemies_supplies_speed()
             # 将敌机从管理它的所有分组中删除
             enemy.kill()
 
@@ -248,7 +266,6 @@ class PlaneWar:
                         > self.score_board.highest_score:
                     # 保存当前得分
                     self.score_board.save_current_score()
-
 
                 # 卸载pygame库
                 pygame.quit()
@@ -450,6 +467,83 @@ class PlaneWar:
         # 检测我方飞机与炸弹补给的碰撞
         self._check_collision_myplane_bombsupply()
 
+    def _update_enemies_supplies_speed(self):
+        """根据当前关数更新所有敌机补给的速度"""
+
+        # 如果当前关数为2，并且还没有更新关数2的速度
+        if self.score_board.current_level == 2 and \
+                not self.is_update_level2_speed:
+            # 更新关数2的速度
+            # 更新所有小型敌机的速度
+            SmallEnemy.update_offset(3)
+            # 更新所有中型敌机的速度
+            MidEnemy.update_offset(3)
+            # 更新所有大型敌机的速度
+            BigEnemy.update_offset(3)
+            # 更新所有子弹补给的速度
+            BulletSupply.update_offset(3)
+            # 更新所有炸弹补给的速度
+            BombSupply.update_offset(3)
+
+            # 标记已经更新关数2的速度
+            self.is_update_level2_speed = True
+
+
+        # 如果当前关数为3，并且还没有更新关数3的速度
+        elif self.score_board.current_level == 2 and \
+                not self.is_update_level2_speed:
+            # 更新关数3的速度
+            # 标记已经更新关数3的速度
+            self.is_update_level3_speed = True
+            # 更新所有小型敌机的速度
+            SmallEnemy.update_offset(2)
+            # 更新所有中型敌机的速度
+            MidEnemy.update_offset(2)
+            # 更新所有大型敌机的速度
+            BigEnemy.update_offset(2)
+            # 更新所有子弹补给的速度
+            BulletSupply.update_offset(2)
+            # 更新所有炸弹补给的速度
+            BombSupply.update_offset(2)
+
+
+        # 如果当前关数为4，并且还没有更新关数4的速度
+        elif self.score_board.current_level == 4 and \
+                not self.is_update_level4_speed:
+
+            # 标记已经更新关数4的速度
+            self.is_update_level4_speed = True
+            # 更新所有小型敌机的速度
+            SmallEnemy.update_offset(1)
+            # 更新所有中型敌机的速度
+            MidEnemy.update_offset(1)
+            # 更新所有大型敌机的速度
+            BigEnemy.update_offset(1)
+            # 更新所有子弹补给的速度
+            BulletSupply.update_offset(1)
+            # 更新所有炸弹补给的速度
+            BombSupply.update_offset(1)
+        # 更新关数4的速度
+
+        # 如果当前关数为5，并且还没有更新关数5的速度
+        elif self.score_board.current_level == 5 and \
+                not self.is_update_level5_speed:
+
+            # 标记已经更新关数5的速度
+            self.is_update_level5_speed = True
+            # 更新所有小型敌机的速度
+            SmallEnemy.update_offset(1)
+            # 更新所有中型敌机的速度
+            MidEnemy.update_offset(1)
+            # 更新所有大型敌机的速度
+            BigEnemy.update_offset(1)
+            # 更新所有子弹补给的速度
+            BulletSupply.update_offset(1)
+            # 更新所有炸弹补给的速度
+            BombSupply.update_offset(1)
+
+        # 更新关数5的速度
+
     def _check_collision_bullets_or_double_smalls(self, group):
         """检测子弹或双发子弹与小型敌机的碰撞"""
 
@@ -469,6 +563,8 @@ class PlaneWar:
                     self._update_current_score(small_enemy)
                     # 根据当前得分来更新当前关数
                     self.score_board.update_current_level()
+                    # 根据当前关数更新所有敌机补给的速度
+                    self._update_enemies_supplies_speed()
                     # 播放小型敌机爆炸的声音
                     small_enemy.play_explode_sound()
                     # 标记小型敌机正在切换爆炸图片
@@ -525,6 +621,9 @@ class PlaneWar:
 
                         # 根据当前得分来更新当前关数
                         self.score_board.update_current_level()
+
+                        # 根据当前关数更新所有敌机补给的速度
+                        self._update_enemies_supplies_speed()
                         # 播放敌机爆炸的声音
                         enemy.play_explode_sound()
                         # 标记敌机正 在切换爆炸图片
@@ -548,6 +647,23 @@ class PlaneWar:
             if enemy.is_switching_explode_image:
                 # 切换敌机爆炸的图片
                 enemy.switch_explode_image()
+
+    def _play_bg_music(self):
+        """播放背景音乐"""
+
+        # 初始化mixer模块
+        pygame.mixer.init()
+
+        # 加载背景音乐
+        pygame.mixer.music.load("sounds/bgm.ogg")
+
+        # 设置音量
+
+        pygame.mixer.music.set_volume(constants.BGM_SOUND_VOLUME)
+
+        # 播放音乐
+
+        pygame.mixer.music.play(-1)
 
     def _check_collision_myplane_enemies(self):
         """检测我方飞机与敌机的碰撞"""
@@ -584,6 +700,10 @@ class PlaneWar:
                     # 停止定时器
                     self._stop_timers()
 
+                    # 停止播放背景音乐
+
+                    pygame.mixer.music.stop()
+
             # 遍历所有发生碰撞的敌机
             for enemy in list_collided:
 
@@ -593,6 +713,8 @@ class PlaneWar:
                     self._update_current_score(enemy)
                     # 根据当前得分来更新当前关数
                     self.score_board.update_current_level()
+                    # 根据当前关数更新所有敌机补给的速度
+                    self._update_enemies_supplies_speed()
                     # 播放敌机爆炸的声音
                     enemy.play_explode_sound()
                     # 标记敌机正在切换爆炸图片

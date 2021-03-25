@@ -8,6 +8,9 @@ import constants
 class MidEnemy(Sprite):
     """中型敌机类"""
 
+    # 中型敌机每次移动时的偏移量
+    offset = 5
+
     def __init__(self, window):
         """初始化中型敌机"""
 
@@ -28,8 +31,7 @@ class MidEnemy(Sprite):
         self.rect.bottom = self.window_rect.top
         self.rect.left = random.randint(0, self.window_rect.width - self.rect.width)
 
-        # 中型敌机每次移动时的偏移量
-        self.offset = 5
+
 
         # 标记中型敌机没有在切换爆炸图片
         self.is_switching_explode_image = False
@@ -48,7 +50,7 @@ class MidEnemy(Sprite):
         """更新中型敌机的位置"""
 
         # 增大中型敌机的属性top以向下移动
-        self.rect.top += self.offset
+        self.rect.top += MidEnemy.offset
 
     def draw(self):
         """再窗口中绘制中型敌机"""
@@ -68,6 +70,13 @@ class MidEnemy(Sprite):
         # 播放爆炸的声音
 
         explode_sound.play()
+
+
+    @classmethod
+    def update_offset(cls, pixels):
+        """更新中型敌机每次移动时的偏移量"""
+        # 中型敌机每次移动时的偏移量增加指定的像素数
+        MidEnemy.offset += pixels
 
     def switch_explode_image(self):
         """切换中型敌机爆炸的图片"""
