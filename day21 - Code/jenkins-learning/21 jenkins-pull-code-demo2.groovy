@@ -482,3 +482,69 @@ def ConfigQualityGates(projectName,gateName){
     response = HttpReq("POST",apiUrl,'')
     println(response)println(response)
 }
+
+
+
+
+
+def sonar_scm_code(sonar_scm_type, sonar_src_dir,sonar_host_url, sonar_server_token,project_version){
+
+    def build_tools = ["sonar": "/usr/local/sonar-scanner-4.6.0.2311/bin"]
+
+    if ( sonar_scm_type == "maven" ){
+        println(".......")
+        sonar_scm_command = ""
+        def sonar_home = sh returnStdout: true, script: 'pwd'
+        if (sonar_home.contains('@')){
+            sonar_home = sonar_home.split("@")
+            sonar_home = sonar_home - sonar_home[-1]
+            println(".........${sonar_home}")
+            sonar_src_dir = "${sonar_home[0]}" + "/" + "${sonar_src_dir}"
+            println(sonar_src_dir)
+        }
+        sh """
+            ${build_tools["sonar"]}/sonar-scanner \
+            -Dsonar.host.url=${sonar_host_url} \
+            -Dsonar.projectKey=${JOB_NAME} \
+            -Dsonar.projectName=${JOB_NAME} \
+            -Dsonar.login=${sonar_server_token} \
+            -Dsonar.projectVersion=${project_version} \
+            -Dsonar.sources=${sonar_src_dir} \
+            -Dsonar.links.homepage=${env.git_http_url} \
+            -Dsonar.links.ci=${JOB_URL} \
+            -Dsonar.sourceEncoding=UTF-8 \
+            -Dsonar.java.binaries=target/classes \
+            -Dsonar.java.test.binaries=target/test-classes \
+            -Dsonar.java.surefire.report=target/surefire-reports
+        """
+    } else if ( sonar_scm_type == "gradle" ){
+        println(".......")
+    } else if ( sonar_scm_type == "nodejs" ){
+        println(".......")
+    } else{
+        println("unknow sonar_scm_type.....")
+    }
+
+}
+
+
+//
+
+
+stage("Scan SCM Code"){
+            when{
+                environment name: 'skip_code_scan', value: 'false'
+            }
+            steps{
+                script{
+                    project_version = tools.get_create_version_time()
+                    // println("${project_version}")
+                    node {
+                        withCredentials([string(credentialsId: "57f14685-9ed2-49c3-858f-3f43b3552572", variable: "SONAR_ADMIN_TOKEN")]) {
+                            tools.print_msg("${SONAR_ADMIN_TOKEN}", "green")
+                            sonar.sonar_scm_code("${build_type}", "src","http://172.16.100.24:9000/", "${SONAR_ADMIN_TOKEN}", "${project_version}")
+                        }
+                    }
+                }
+            }
+        }
